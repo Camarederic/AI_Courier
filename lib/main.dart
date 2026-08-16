@@ -1,3 +1,4 @@
+import 'orders_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -28,10 +29,16 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('AI Courier')),
-      body: const Center(
-        child: Text(
-          'AI Courier',
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+      body: Center(
+        child: ElevatedButton.icon(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const OrdersPage()),
+            );
+          },
+          icon: const Icon(Icons.local_shipping),
+          label: const Text('Заказы'),
         ),
       ),
     );
