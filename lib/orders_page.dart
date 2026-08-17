@@ -12,19 +12,19 @@ class OrdersPage extends StatefulWidget {
 
 class _OrdersPageState extends State<OrdersPage> {
   final List<Order> orders = [
-    const Order(
+    Order(
       orderNumber: '№1001',
       address: 'ул. Ленина, 15',
       time: '14:00–16:00',
       comment: '',
     ),
-    const Order(
+    Order(
       orderNumber: '№1002',
       address: 'ул. Гагарина, 8',
       time: '16:00–18:00',
       comment: '',
     ),
-    const Order(
+    Order(
       orderNumber: '№1003',
       address: 'пр. Победы, 21',
       time: '18:00–20:00',
@@ -60,13 +60,16 @@ class _OrdersPageState extends State<OrdersPage> {
             address: order.address,
             time: order.time,
             comment: order.comment,
-            onTap: () {
-              Navigator.push(
+            status: order.status,
+            onTap: () async {
+              await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => OrderDetailsPage(order: order),
                 ),
               );
+
+              setState(() {});
             },
           );
         },
@@ -85,6 +88,7 @@ class OrderCard extends StatelessWidget {
   final String address;
   final String time;
   final String comment;
+  final OrderStatus status;
   final VoidCallback onTap;
 
   const OrderCard({
@@ -93,8 +97,20 @@ class OrderCard extends StatelessWidget {
     required this.address,
     required this.time,
     required this.comment,
+    required this.status,
     required this.onTap,
   });
+
+  String getStatusText() {
+    switch (status) {
+      case OrderStatus.newOrder:
+        return 'Новый';
+      case OrderStatus.inTransit:
+        return 'В пути';
+      case OrderStatus.delivered:
+        return 'Доставлен';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,7 +127,17 @@ class OrderCard extends StatelessWidget {
         ),
         subtitle: Text('$address\n$time$commentText'),
         isThreeLine: comment.isNotEmpty,
-        trailing: const Icon(Icons.chevron_right),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              getStatusText(),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const Icon(Icons.chevron_right),
+          ],
+        ),
       ),
     );
   }
