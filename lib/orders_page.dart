@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'add_order_page.dart';
 import 'order.dart';
+import 'order_details_page.dart';
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
@@ -59,6 +60,14 @@ class _OrdersPageState extends State<OrdersPage> {
             address: order.address,
             time: order.time,
             comment: order.comment,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => OrderDetailsPage(order: order),
+                ),
+              );
+            },
           );
         },
       ),
@@ -76,6 +85,7 @@ class OrderCard extends StatelessWidget {
   final String address;
   final String time;
   final String comment;
+  final VoidCallback onTap;
 
   const OrderCard({
     super.key,
@@ -83,6 +93,7 @@ class OrderCard extends StatelessWidget {
     required this.address,
     required this.time,
     required this.comment,
+    required this.onTap,
   });
 
   @override
@@ -92,6 +103,7 @@ class OrderCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
+        onTap: onTap,
         leading: const CircleAvatar(child: Icon(Icons.local_shipping)),
         title: Text(
           'Заказ $orderNumber',
