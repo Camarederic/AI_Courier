@@ -32,6 +32,15 @@ class _OrdersPageState extends State<OrdersPage> {
     ),
   ];
 
+  final searchController = TextEditingController();
+  OrderStatus? selectedStatus;
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> addOrder() async {
     final newOrder = await Navigator.push<Order>(
       context,
@@ -45,40 +54,128 @@ class _OrdersPageState extends State<OrdersPage> {
     }
   }
 
+  List<Order> get filteredOrders {
+    final query = searchController.text.toLowerCase().trim();
+
+    return orders.where((order) {
+      final matchesSearch =
+          order.orderNumber.toLowerCase().contains(query) ||
+          order.address.toLowerCase().contains(query) ||
+          order.comment.toLowerCase().contains(query);
+
+      final matchesStatus =
+          selectedStatus == null || order.status == selectedStatus;
+
+      return matchesSearch && matchesStatus;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Заказы')),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          final order = orders[index];
-
-          return OrderCard(
-            orderNumber: order.orderNumber,
-            address: order.address,
-            time: order.time,
-            comment: order.comment,
-            status: order.status,
-            onTap: () async {
-              final shouldDelete = await Navigator.push<bool>(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => OrderDetailsPage(order: order),
-                ),
-              );
-
-              if (shouldDelete == true) {
-                setState(() {
-                  orders.remove(order);
-                });
-              } else {
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: TextField(
+              controller: searchController,
+              onChanged: (value) {
                 setState(() {});
-              }
-            },
-          );
-        },
+              },
+              decoration: InputDecoration(
+                labelText: 'Поиск заказа',
+                hintText: 'Номер, адрес или комментарий',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        onPressed: () {
+                          searchController.clear();
+                          setState(() {});
+                        },
+                        icon: const Icon(Icons.clear),
+                      )
+                    : null,
+                border: const OutlineInputBorder(),
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DropdownButtonFormField<OrderStatus?>(
+              initialValue: selectedStatus,
+              decoration: const InputDecoration(
+                labelText: 'Фильтр по статусу',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem<OrderStatus?>(value: null, child: Text('Все')),
+                DropdownMenuItem<OrderStatus?>(
+                  value: OrderStatus.newOrder,
+                  child: Text('Новые'),
+                ),
+                DropdownMenuItem<OrderStatus?>(
+                  value: OrderStatus.inTransit,
+                  child: Text('В пути'),
+                ),
+                DropdownMenuItem<OrderStatus?>(
+                  value: OrderStatus.delivered,
+                  child: Text('Доставлены'),
+                ),
+              ],
+              onChanged: (OrderStatus? value) {
+                setState(() {
+                  selectedStatus = value;
+                });
+              },
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Expanded(
+            child: filteredOrders.isEmpty
+                ? const Center(
+                    child: Text(
+                      '🔍 Заказы не найдены',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filteredOrders.length,
+                    itemBuilder: (context, index) {
+                      final order = filteredOrders[index];
+
+                      return OrderCard(
+                        orderNumber: order.orderNumber,
+                        address: order.address,
+                        time: order.time,
+                        comment: order.comment,
+                        status: order.status,
+                        onTap: () async {
+                          final shouldDelete = await Navigator.push<bool>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  OrderDetailsPage(order: order),
+                            ),
+                          );
+
+                          if (shouldDelete == true) {
+                            setState(() {
+                              orders.remove(order);
+                            });
+                          } else {
+                            setState(() {});
+                          }
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: addOrder,
