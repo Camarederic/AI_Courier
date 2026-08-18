@@ -2,9 +2,9 @@ enum OrderStatus { newOrder, inTransit, delivered }
 
 class Order {
   final String orderNumber;
-  final String address;
-  final String time;
-  final String comment;
+  String address;
+  String time;
+  String comment;
   OrderStatus status;
 
   Order({

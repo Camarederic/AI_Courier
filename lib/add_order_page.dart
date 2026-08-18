@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'order.dart';
 
 class AddOrderPage extends StatefulWidget {
-  const AddOrderPage({super.key});
+  final Order? order;
+
+  const AddOrderPage({super.key, this.order});
 
   @override
   State<AddOrderPage> createState() => _AddOrderPageState();
@@ -12,6 +14,17 @@ class _AddOrderPageState extends State<AddOrderPage> {
   final addressController = TextEditingController();
   final timeController = TextEditingController();
   final commentController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.order != null) {
+      addressController.text = widget.order!.address;
+      timeController.text = widget.order!.time;
+      commentController.text = widget.order!.comment;
+    }
+  }
 
   @override
   void dispose() {
@@ -24,7 +37,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Добавить заказ')),
+      appBar: AppBar(
+        title: Text(
+          widget.order == null ? 'Добавить заказ' : 'Редактировать заказ',
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -77,17 +94,29 @@ class _AddOrderPageState extends State<AddOrderPage> {
                     return;
                   }
 
-                  final newOrder = Order(
-                    orderNumber: '№${1004}',
-                    address: addressController.text.trim(),
-                    time: timeController.text.trim(),
-                    comment: commentController.text.trim(),
-                  );
+                  if (widget.order != null) {
+                    widget.order!.address = addressController.text.trim();
+                    widget.order!.time = timeController.text.trim();
+                    widget.order!.comment = commentController.text.trim();
 
-                  Navigator.pop(context, newOrder);
+                    Navigator.pop(context);
+                  } else {
+                    final newOrder = Order(
+                      orderNumber: '№${1004}',
+                      address: addressController.text.trim(),
+                      time: timeController.text.trim(),
+                      comment: commentController.text.trim(),
+                    );
+
+                    Navigator.pop(context, newOrder);
+                  }
                 },
-                icon: const Icon(Icons.check),
-                label: const Text('Создать заказ'),
+                icon: Icon(widget.order == null ? Icons.check : Icons.save),
+                label: Text(
+                  widget.order == null
+                      ? 'Создать заказ'
+                      : 'Сохранить изменения',
+                ),
               ),
             ),
           ],

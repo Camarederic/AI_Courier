@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'order.dart';
+import 'add_order_page.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final Order order;
@@ -26,6 +27,20 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Заказ ${widget.order.orderNumber}')),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddOrderPage(order: widget.order),
+            ),
+          );
+
+          setState(() {});
+        },
+        icon: const Icon(Icons.edit),
+        label: const Text('Редактировать'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
