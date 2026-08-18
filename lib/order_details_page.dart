@@ -27,19 +27,63 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Заказ ${widget.order.orderNumber}')),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddOrderPage(order: widget.order),
-            ),
-          );
+      floatingActionButton: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddOrderPage(order: widget.order),
+                ),
+              );
 
-          setState(() {});
-        },
-        icon: const Icon(Icons.edit),
-        label: const Text('Редактировать'),
+              setState(() {});
+            },
+            icon: const Icon(Icons.edit),
+            label: const Text('Редактировать'),
+          ),
+
+          const SizedBox(height: 12),
+
+          FloatingActionButton.extended(
+            onPressed: () async {
+              final shouldDelete = await showDialog<bool>(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: const Text('Удалить заказ?'),
+                    content: Text(
+                      'Вы действительно хотите удалить заказ '
+                      '${widget.order.orderNumber}?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, false);
+                        },
+                        child: const Text('Отмена'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
+                        child: const Text('Удалить'),
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              if (shouldDelete == true) {
+                Navigator.pop(context, true);
+              }
+            },
+            icon: const Icon(Icons.delete),
+            label: const Text('Удалить'),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

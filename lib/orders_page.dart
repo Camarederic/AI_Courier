@@ -62,14 +62,20 @@ class _OrdersPageState extends State<OrdersPage> {
             comment: order.comment,
             status: order.status,
             onTap: () async {
-              await Navigator.push(
+              final shouldDelete = await Navigator.push<bool>(
                 context,
                 MaterialPageRoute(
                   builder: (context) => OrderDetailsPage(order: order),
                 ),
               );
 
-              setState(() {});
+              if (shouldDelete == true) {
+                setState(() {
+                  orders.remove(order);
+                });
+              } else {
+                setState(() {});
+              }
             },
           );
         },
