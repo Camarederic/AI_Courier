@@ -1,9 +1,12 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+
 import 'order.dart';
 
 class OrderStorage {
   static const String _ordersKey = 'orders';
+  static const String _lastOrderNumberKey = 'lastOrderNumber';
 
   static Future<void> saveOrders(List<Order> orders) async {
     final prefs = await SharedPreferences.getInstance();
@@ -44,5 +47,23 @@ class OrderStorage {
         ),
       );
     }).toList();
+  }
+
+  // Возвращает следующий номер заказа.
+  static Future<String> getNextOrderNumber() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final lastNumber = prefs.getInt(_lastOrderNumberKey) ?? 0;
+
+    final nextNumber = lastNumber + 1;
+
+    await prefs.setInt(_lastOrderNumberKey, nextNumber);
+
+    return '№$nextNumber';
+  }
+
+  static Future<void> resetOrderNumber() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_lastOrderNumberKey);
   }
 }

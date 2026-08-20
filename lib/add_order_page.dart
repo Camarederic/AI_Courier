@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'order.dart';
+import 'order_storage.dart';
 
 class AddOrderPage extends StatefulWidget {
   final Order? order;
@@ -86,7 +87,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {
+                onPressed: () async {
                   if (addressController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Введите адрес доставки')),
@@ -101,8 +102,14 @@ class _AddOrderPageState extends State<AddOrderPage> {
 
                     Navigator.pop(context);
                   } else {
+                    final orderNumber = await OrderStorage.getNextOrderNumber();
+
+                    if (!context.mounted) {
+                      return;
+                    }
+
                     final newOrder = Order(
-                      orderNumber: '№${1004}',
+                      orderNumber: orderNumber,
                       address: addressController.text.trim(),
                       time: timeController.text.trim(),
                       comment: commentController.text.trim(),

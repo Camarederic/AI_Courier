@@ -39,6 +39,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 ),
               );
 
+              if (!mounted) {
+                return;
+              }
+
               setState(() {});
             },
             icon: const Icon(Icons.edit),
@@ -77,6 +81,10 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
               );
 
               if (shouldDelete == true) {
+                if (!context.mounted) {
+                  return;
+                }
+
                 Navigator.pop(context, true);
               }
             },
