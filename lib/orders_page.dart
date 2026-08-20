@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'add_order_page.dart';
 import 'order.dart';
 import 'order_details_page.dart';
+import 'order_storage.dart';
 
 class OrdersPage extends StatefulWidget {
   const OrdersPage({super.key});
@@ -11,29 +12,36 @@ class OrdersPage extends StatefulWidget {
 }
 
 class _OrdersPageState extends State<OrdersPage> {
-  final List<Order> orders = [
-    Order(
-      orderNumber: '№1001',
-      address: 'ул. Ленина, 15',
-      time: '14:00–16:00',
-      comment: '',
-    ),
-    Order(
-      orderNumber: '№1002',
-      address: 'ул. Гагарина, 8',
-      time: '16:00–18:00',
-      comment: '',
-    ),
-    Order(
-      orderNumber: '№1003',
-      address: 'пр. Победы, 21',
-      time: '18:00–20:00',
-      comment: '',
-    ),
-  ];
+  final List<Order> orders = [];
 
   final searchController = TextEditingController();
+
   OrderStatus? selectedStatus;
+
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrders();
+  }
+
+  Future<void> _loadOrders() async {
+    final savedOrders = await OrderStorage.loadOrders();
+
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      orders.addAll(savedOrders);
+      _isLoading = false;
+    });
+  }
+
+  Future<void> _saveOrders() async {
+    await OrderStorage.saveOrders(orders);
+  }
 
   @override
   void dispose() {
@@ -51,6 +59,8 @@ class _OrdersPageState extends State<OrdersPage> {
       setState(() {
         orders.add(newOrder);
       });
+
+      await _saveOrders();
     }
   }
 
@@ -72,6 +82,13 @@ class _OrdersPageState extends State<OrdersPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: Text('Заказы')),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Заказы')),
       body: Column(
@@ -163,12 +180,19 @@ class _OrdersPageState extends State<OrdersPage> {
                             ),
                           );
 
+                          if (!mounted) {
+                            return;
+                          }
+
                           if (shouldDelete == true) {
                             setState(() {
                               orders.remove(order);
                             });
+
+                            await _saveOrders();
                           } else {
                             setState(() {});
+                            await _saveOrders();
                           }
                         },
                       );
@@ -245,3 +269,8 @@ class OrderCard extends StatelessWidget {
     );
   }
 }
+
+
+
+
+
