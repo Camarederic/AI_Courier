@@ -215,10 +215,22 @@ class _OrdersPageState extends State<OrdersPage> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: addOrder,
-        icon: const Icon(Icons.add),
-        label: const Text('Добавить заказ'),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+          child: SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton.icon(
+              onPressed: addOrder,
+              icon: const Icon(Icons.add),
+              label: const Text(
+                'Добавить заказ',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
