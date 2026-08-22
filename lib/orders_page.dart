@@ -180,8 +180,10 @@ class _OrdersPageState extends State<OrdersPage> {
                           final shouldDelete = await Navigator.push<bool>(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  OrderDetailsPage(order: order),
+                              builder: (context) => OrderDetailsPage(
+                                order: order,
+                                onOrderChanged: _saveOrders,
+                              ),
                             ),
                           );
 

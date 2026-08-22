@@ -4,8 +4,13 @@ import 'add_order_page.dart';
 
 class OrderDetailsPage extends StatefulWidget {
   final Order order;
+  final Future<void> Function() onOrderChanged;
 
-  const OrderDetailsPage({super.key, required this.order});
+  const OrderDetailsPage({
+    super.key,
+    required this.order,
+    required this.onOrderChanged,
+  });
 
   @override
   State<OrderDetailsPage> createState() => _OrderDetailsPageState();
@@ -155,7 +160,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                   child: Text('Доставлен'),
                 ),
               ],
-              onChanged: (OrderStatus? newStatus) {
+              onChanged: (OrderStatus? newStatus) async {
                 if (newStatus == null) {
                   return;
                 }
@@ -163,6 +168,8 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
                 setState(() {
                   widget.order.status = newStatus;
                 });
+
+                await widget.onOrderChanged();
               },
             ),
 
