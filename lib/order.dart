@@ -7,11 +7,15 @@ class Order {
   String comment;
   OrderStatus status;
 
+  // Дата и время создания заказа.
+  final DateTime createdAt;
+
   Order({
     required this.orderNumber,
     required this.address,
     required this.time,
     required this.comment,
+    required this.createdAt,
     this.status = OrderStatus.newOrder,
   });
 
@@ -23,6 +27,7 @@ class Order {
       'time': time,
       'comment': comment,
       'status': status.name,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
@@ -37,6 +42,9 @@ class Order {
         (status) => status.name == json['status'],
         orElse: () => OrderStatus.newOrder,
       ),
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
     );
   }
 }

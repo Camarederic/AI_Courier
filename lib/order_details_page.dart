@@ -23,6 +23,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     }
   }
 
+  String _formatCreatedAt(DateTime dateTime) {
+    final day = dateTime.day.toString().padLeft(2, '0');
+    final month = dateTime.month.toString().padLeft(2, '0');
+    final year = dateTime.year.toString();
+
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+
+    return '$day.$month.$year $hour:$minute';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -107,6 +118,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
             const Text('Адрес', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
             Text(widget.order.address),
+
+            const SizedBox(height: 20),
+
+            const Text('Создан', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            Text(_formatCreatedAt(widget.order.createdAt)),
 
             const SizedBox(height: 20),
 

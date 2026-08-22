@@ -12,13 +12,7 @@ class OrderStorage {
     final prefs = await SharedPreferences.getInstance();
 
     final ordersJson = orders.map((order) {
-      return {
-        'orderNumber': order.orderNumber,
-        'address': order.address,
-        'time': order.time,
-        'comment': order.comment,
-        'status': order.status.name,
-      };
+      return order.toJson();
     }).toList();
 
     await prefs.setString(_ordersKey, jsonEncode(ordersJson));
@@ -36,16 +30,7 @@ class OrderStorage {
     final List<dynamic> decoded = jsonDecode(data);
 
     return decoded.map((item) {
-      return Order(
-        orderNumber: item['orderNumber'],
-        address: item['address'],
-        time: item['time'],
-        comment: item['comment'],
-        status: OrderStatus.values.firstWhere(
-          (status) => status.name == item['status'],
-          orElse: () => OrderStatus.newOrder,
-        ),
-      );
+      return Order.fromJson(Map<String, dynamic>.from(item));
     }).toList();
   }
 

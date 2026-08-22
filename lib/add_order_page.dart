@@ -113,6 +113,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
                       address: addressController.text.trim(),
                       time: timeController.text.trim(),
                       comment: commentController.text.trim(),
+                      createdAt: DateTime.now(),
                     );
 
                     Navigator.pop(context, newOrder);
