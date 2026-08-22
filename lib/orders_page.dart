@@ -67,7 +67,7 @@ class _OrdersPageState extends State<OrdersPage> {
   List<Order> get filteredOrders {
     final query = searchController.text.toLowerCase().trim();
 
-    return orders.where((order) {
+    final result = orders.where((order) {
       final matchesSearch =
           order.orderNumber.toLowerCase().contains(query) ||
           order.address.toLowerCase().contains(query) ||
@@ -78,6 +78,10 @@ class _OrdersPageState extends State<OrdersPage> {
 
       return matchesSearch && matchesStatus;
     }).toList();
+
+    result.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return result;
   }
 
   @override
