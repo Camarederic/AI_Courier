@@ -171,6 +171,7 @@ class _OrdersPageState extends State<OrdersPage> {
                         time: order.time,
                         comment: order.comment,
                         status: order.status,
+                        createdAt: order.createdAt,
                         onTap: () async {
                           final shouldDelete = await Navigator.push<bool>(
                             context,
@@ -216,6 +217,7 @@ class OrderCard extends StatelessWidget {
   final String time;
   final String comment;
   final OrderStatus status;
+  final DateTime createdAt;
   final VoidCallback onTap;
 
   const OrderCard({
@@ -225,6 +227,7 @@ class OrderCard extends StatelessWidget {
     required this.time,
     required this.comment,
     required this.status,
+    required this.createdAt,
     required this.onTap,
   });
 
@@ -237,6 +240,17 @@ class OrderCard extends StatelessWidget {
       case OrderStatus.delivered:
         return 'Доставлен';
     }
+  }
+
+  String _formatCreatedAt() {
+    final day = createdAt.day.toString().padLeft(2, '0');
+    final month = createdAt.month.toString().padLeft(2, '0');
+    final year = createdAt.year.toString();
+
+    final hour = createdAt.hour.toString().padLeft(2, '0');
+    final minute = createdAt.minute.toString().padLeft(2, '0');
+
+    return '$day.$month.$year $hour:$minute';
   }
 
   @override
@@ -252,8 +266,10 @@ class OrderCard extends StatelessWidget {
           'Заказ $orderNumber',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text('$address\n$time$commentText'),
-        isThreeLine: comment.isNotEmpty,
+        subtitle: Text(
+          '$address\n$time\nСоздан: ${_formatCreatedAt()}$commentText',
+        ),
+        isThreeLine: true,
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -269,8 +285,3 @@ class OrderCard extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
