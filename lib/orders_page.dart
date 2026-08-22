@@ -176,9 +176,16 @@ class _OrdersPageState extends State<OrdersPage> {
                         comment: order.comment,
                         status: order.status,
                         createdAt: order.createdAt,
+                        deliveredAt: order.deliveredAt,
                         onStatusChanged: (newStatus) async {
                           setState(() {
                             order.status = newStatus;
+
+                            if (newStatus == OrderStatus.delivered) {
+                              order.deliveredAt = DateTime.now();
+                            } else {
+                              order.deliveredAt = null;
+                            }
                           });
 
                           await _saveOrders();
@@ -243,6 +250,7 @@ class OrderCard extends StatelessWidget {
   final String comment;
   final OrderStatus status;
   final DateTime createdAt;
+  final DateTime? deliveredAt;
   final Future<void> Function(OrderStatus) onStatusChanged;
   final VoidCallback onTap;
 
@@ -254,6 +262,7 @@ class OrderCard extends StatelessWidget {
     required this.comment,
     required this.status,
     required this.createdAt,
+    required this.deliveredAt,
     required this.onStatusChanged,
     required this.onTap,
   });
@@ -280,10 +289,23 @@ class OrderCard extends StatelessWidget {
     return '$day.$month.$year $hour:$minute';
   }
 
+  String _formatDeliveredAt() {
+    if (deliveredAt == null) {
+      return '';
+    }
+
+    final day = deliveredAt!.day.toString().padLeft(2, '0');
+    final month = deliveredAt!.month.toString().padLeft(2, '0');
+    final year = deliveredAt!.year.toString();
+
+    final hour = deliveredAt!.hour.toString().padLeft(2, '0');
+    final minute = deliveredAt!.minute.toString().padLeft(2, '0');
+
+    return '$day.$month.$year $hour:$minute';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final commentText = comment.isEmpty ? '' : '\n$comment';
-
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
@@ -293,10 +315,36 @@ class OrderCard extends StatelessWidget {
           'Заказ $orderNumber',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text(
-          '$address\n$time\nСоздан: ${_formatCreatedAt()}$commentText',
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(address),
+            Text(time),
+
+            const SizedBox(height: 4),
+
+            const Text(
+              'Создан:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(_formatCreatedAt()),
+
+            if (deliveredAt != null) ...[
+              const SizedBox(height: 4),
+              const Text(
+                'Доставлен:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              Text(_formatDeliveredAt()),
+            ],
+
+            if (comment.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(comment),
+            ],
+          ],
         ),
-        isThreeLine: true,
+        isThreeLine: false,
         trailing: DropdownButton<OrderStatus>(
           value: status,
           underline: const SizedBox(),

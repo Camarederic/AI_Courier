@@ -28,7 +28,7 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
     }
   }
 
-  String _formatCreatedAt(DateTime dateTime) {
+  String _formatDateTime(DateTime dateTime) {
     final day = dateTime.day.toString().padLeft(2, '0');
     final month = dateTime.month.toString().padLeft(2, '0');
     final year = dateTime.year.toString();
@@ -128,7 +128,17 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
             const Text('Создан', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 6),
-            Text(_formatCreatedAt(widget.order.createdAt)),
+            Text(_formatDateTime(widget.order.createdAt)),
+
+            if (widget.order.deliveredAt != null) ...[
+              const SizedBox(height: 20),
+              const Text(
+                'Доставлен',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              Text(_formatDateTime(widget.order.deliveredAt!)),
+            ],
 
             const SizedBox(height: 20),
 
@@ -167,6 +177,12 @@ class _OrderDetailsPageState extends State<OrderDetailsPage> {
 
                 setState(() {
                   widget.order.status = newStatus;
+
+                  if (newStatus == OrderStatus.delivered) {
+                    widget.order.deliveredAt = DateTime.now();
+                  } else {
+                    widget.order.deliveredAt = null;
+                  }
                 });
 
                 await widget.onOrderChanged();

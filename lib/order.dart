@@ -10,6 +10,9 @@ class Order {
   // Дата и время создания заказа.
   final DateTime createdAt;
 
+  // Дата и время фактической доставки.
+  DateTime? deliveredAt;
+
   Order({
     required this.orderNumber,
     required this.address,
@@ -17,6 +20,7 @@ class Order {
     required this.comment,
     required this.createdAt,
     this.status = OrderStatus.newOrder,
+    this.deliveredAt,
   });
 
   // Превращаем заказ в данные для сохранения.
@@ -28,6 +32,7 @@ class Order {
       'comment': comment,
       'status': status.name,
       'createdAt': createdAt.toIso8601String(),
+      'deliveredAt': deliveredAt?.toIso8601String(),
     };
   }
 
@@ -45,6 +50,9 @@ class Order {
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
+      deliveredAt: json['deliveredAt'] != null
+          ? DateTime.parse(json['deliveredAt'] as String)
+          : null,
     );
   }
 }
