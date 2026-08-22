@@ -176,6 +176,13 @@ class _OrdersPageState extends State<OrdersPage> {
                         comment: order.comment,
                         status: order.status,
                         createdAt: order.createdAt,
+                        onStatusChanged: (newStatus) async {
+                          setState(() {
+                            order.status = newStatus;
+                          });
+
+                          await _saveOrders();
+                        },
                         onTap: () async {
                           final shouldDelete = await Navigator.push<bool>(
                             context,
@@ -224,6 +231,7 @@ class OrderCard extends StatelessWidget {
   final String comment;
   final OrderStatus status;
   final DateTime createdAt;
+  final Future<void> Function(OrderStatus) onStatusChanged;
   final VoidCallback onTap;
 
   const OrderCard({
@@ -234,6 +242,7 @@ class OrderCard extends StatelessWidget {
     required this.comment,
     required this.status,
     required this.createdAt,
+    required this.onStatusChanged,
     required this.onTap,
   });
 
@@ -276,16 +285,27 @@ class OrderCard extends StatelessWidget {
           '$address\n$time\nСоздан: ${_formatCreatedAt()}$commentText',
         ),
         isThreeLine: true,
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              getStatusText(),
-              style: const TextStyle(fontWeight: FontWeight.bold),
+        trailing: DropdownButton<OrderStatus>(
+          value: status,
+          underline: const SizedBox(),
+          items: const [
+            DropdownMenuItem(value: OrderStatus.newOrder, child: Text('Новый')),
+            DropdownMenuItem(
+              value: OrderStatus.inTransit,
+              child: Text('В пути'),
             ),
-            const Icon(Icons.chevron_right),
+            DropdownMenuItem(
+              value: OrderStatus.delivered,
+              child: Text('Доставлен'),
+            ),
           ],
+          onChanged: (OrderStatus? newStatus) {
+            if (newStatus == null || newStatus == status) {
+              return;
+            }
+
+            onStatusChanged(newStatus);
+          },
         ),
       ),
     );
